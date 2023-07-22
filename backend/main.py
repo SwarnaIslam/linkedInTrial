@@ -35,7 +35,6 @@ def get_db():
     db = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="123456",
         database="e_library"
     )
     return db
