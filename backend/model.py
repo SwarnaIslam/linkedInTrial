@@ -15,3 +15,7 @@ class User(BaseModel):
     role: str = ""
 
 
+class POSTS(BaseModel):
+    image_name:str=""
+    username:str=""
+    text:str=""

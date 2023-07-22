@@ -1,5 +1,6 @@
-from model import User
+from model import User,POSTS
 import os
+import io
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
@@ -10,6 +11,8 @@ import smtplib
 from email.mime.text import MIMEText
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, File, UploadFile
+from minio import Minio
+import uuid
 
 
 app = FastAPI()
@@ -79,4 +82,64 @@ async def signup(user: User, db: mysql.connector.connection.MySQLConnection = De
 
         return {"User created successfully"}
 
+# MinIO client configuration
+minio_client = Minio(
+    "127.0.0.1:9000",  # MinIO server address
+    access_key="EsCAeDi5YXtJoaoXoOSI",
+    secret_key="4yRy6oiALNkaeVQX5kTobyxAgld28eRDhOzhW8cP",
+    secure=False,  # Set to True if using HTTPS
+)
 
+@app.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    # Read the file contents into bytes using read()
+    file_bytes = await file.read()
+
+    unique_filename = str(uuid.uuid4()) + "_" + file.filename
+    # Convert bytes to an io.BytesIO object
+    file_stream = io.BytesIO(file_bytes)
+
+    # Use the io.BytesIO object to upload the file to MinIO
+    minio_client.put_object(
+        "linkedin",
+        unique_filename,
+        file_stream,
+        length=len(file_bytes),
+        content_type=file.content_type,
+    )
+
+    return {"message": "Image uploaded successfully"}
+
+@app.get("/posts", response_model=list[POSTS])
+async def get_posts():
+    # Create cursor object to execute SQL queries
+    db = get_db()
+    cursor = db.cursor()
+
+    # Define SQL command to search for books with the given category
+    sql = "SELECT * FROM POSTS"
+
+    # Execute SQL command to search for books in the database
+    cursor.execute(sql)
+
+    # Get all rows that match the search criteria
+    posts = cursor.fetchall()
+
+    # Check if any books were found
+    if len(posts) == 0:
+        return JSONResponse(content={"message": "No posts found"})
+    else:
+        # Convert the result to a list of dictionaries
+        post_list = []
+        for post in posts:
+            post_list.append({
+                "image_name":post.image_name,
+                "username":post.username,
+                "text":post.texts
+            })
+
+        # close db connection
+        cursor.close()
+        db.close()
+        # Return the list of books as a JSON response
+        return post_list
