@@ -90,8 +90,8 @@ minio_client = Minio(
     secure=False,  # Set to True if using HTTPS
 )
 
-@app.post("/upload")
-async def upload(file: UploadFile = File(...)):
+@app.post("/upload-image")
+async def uploadImage(file: UploadFile = File(...)):
     # Read the file contents into bytes using read()
     file_bytes = await file.read()
 
