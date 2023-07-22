@@ -1,0 +1,17 @@
+create table user (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(50),
+    roll varchar(20),
+    batch varchar(10),
+    session varchar(10),
+    program_level varchar(10),
+    mobile_number varchar(30),
+    address varchar(250),
+    email varchar(250),
+    password varchar(250),
+    status varchar(20),
+    role varchar(20),
+    UNIQUE (email)
+);
+
+

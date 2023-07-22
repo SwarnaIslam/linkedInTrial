@@ -1,0 +1,13 @@
+<ng-container *ngIf="getLoginStatus; else appNav">
+    <app-user-navbar></app-user-navbar>
+</ng-container>
+
+<ng-template #appNav>
+    <!-- Render the app-navbar component -->
+    <app-navbar></app-navbar>
+</ng-template>
+
+<!-- Render the rest of the content -->
+<ngx-ui-loader></ngx-ui-loader>
+<router-outlet></router-outlet>
+<app-footer></app-footer>

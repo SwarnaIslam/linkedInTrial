@@ -1,0 +1,17 @@
+<div class="wrapper">
+    <div class="title">Login Form</div>
+    <form #fromdata="ngForm" (ngSubmit)="onSubmit()">
+        <div class="field">
+            <input type="text" name="email" required [(ngModel)]="email">
+            <label>Email Address</label>
+        </div>
+        <div class="field">
+            <input type="password" name="password" required [(ngModel)]="password">
+            <label>Password</label>
+        </div>
+        <div class="field">
+            <input type="submit" value="Login">
+        </div>
+        <div class="signup-link">Not a member? <a routerLink="/signup">Register</a> here!</div>
+    </form>
+</div>
