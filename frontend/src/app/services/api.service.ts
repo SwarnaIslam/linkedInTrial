@@ -30,7 +30,7 @@ export class ApiService {
 
 
   allPosts() {
-    return this.http.get(this.url + '/posts', {
+    return this.http.get(this.url + '/all-posts', {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
   }

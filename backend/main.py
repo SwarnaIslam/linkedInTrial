@@ -125,36 +125,38 @@ async def add_post(post:POSTS):
         db.close()
     return {"message": "Post added successfully"}
 
-@app.get("/posts", response_model=list[POSTS])
-async def get_posts():
-    # Create cursor object to execute SQL queries
+# Get all unapproved users [DONE]
+@app.get("/all-posts", response_model=list[User])
+def get_posts():
+    # MySQL Connection
     db = get_db()
     cursor = db.cursor()
 
-    # Define SQL command to search for books with the given category
-    sql = "SELECT * FROM POSTS"
+    # Query
+    query = "SELECT * FROM posts"
 
-    # Execute SQL command to search for books in the database
-    cursor.execute(sql)
+    # Execute Query
+    cursor.execute(query)
 
     # Get all rows that match the search criteria
     posts = cursor.fetchall()
 
-    # Check if any books were found
+    # Check if any users were found
     if len(posts) == 0:
-        return JSONResponse(content={"message": "No posts found"})
+        return JSONResponse(content={"message": "No unapproved users found"})
     else:
-        # Convert the result to a list of dictionaries
+        # Convert the result to a list of User objects
         post_list = []
         for post in posts:
             post_list.append({
-                "image_name":post.image_name,
-                "username":post.username,
-                "text":post.texts
+                "image_name": post[0],
+                "username": post[1],
+                "texts": post[2]
             })
 
-        # close db connection
+        # Close the database connection
         cursor.close()
         db.close()
-        # Return the list of books as a JSON response
+
+        # Return the list of unapproved users as a JSON response
         return post_list
