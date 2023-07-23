@@ -90,25 +90,31 @@ minio_client = Minio(
     secure=False,  # Set to True if using HTTPS
 )
 
-@app.post("/upload-image")
-async def uploadImage(file: UploadFile = File(...)):
-    # Read the file contents into bytes using read()
-    file_bytes = await file.read()
+# @app.post("/upload-image")
+# async def uploadImage(file: UploadFile = File(...)):
+#     print(file)
+#     # Read the file contents into bytes using read()
+#     file_bytes = await file.read()
 
-    unique_filename = str(uuid.uuid4()) + "_" + file.filename
-    # Convert bytes to an io.BytesIO object
-    file_stream = io.BytesIO(file_bytes)
+#     unique_filename = str(uuid.uuid4()) + "_" + file.filename
+#     # Convert bytes to an io.BytesIO object
+#     file_stream = io.BytesIO(file_bytes)
 
-    # Use the io.BytesIO object to upload the file to MinIO
-    minio_client.put_object(
-        "linkedin",
-        unique_filename,
-        file_stream,
-        length=len(file_bytes),
-        content_type=file.content_type,
-    )
+#     # Use the io.BytesIO object to upload the file to MinIO
+#     minio_client.put_object(
+#         "linkedin",
+#         unique_filename,
+#         file_stream,
+#         length=len(file_bytes),
+#         content_type=file.content_type,
+#     )
 
-    return {"message": "Image uploaded successfully"}
+#     return {"message": "Image uploaded successfully"}
+
+@app.post("/thumbnail-upload")
+def create_file(thumbnail: UploadFile = File(...)):
+    print(thumbnail)
+    return {"file_size": len(thumbnail.file.read())}
 
 @app.get("/posts", response_model=list[POSTS])
 async def get_posts():

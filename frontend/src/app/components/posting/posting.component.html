@@ -1,28 +1,23 @@
-<section >
+<section>
     <div class="container">
-        <form action="" method="post" enctype="multipart/form-data">
-
-            <div class="row">
-                <div class="col-md-2">Text:</div>
-                <div class="col-md-10">
-                    <textarea name="address" id="address" cols="30" rows="3" class="form-control"></textarea>
-                </div>
+      <form class="example-form" [formGroup]="post" ngNativeValidate>
+  
+        <div class="row">
+            <textarea formControlName="texts"></textarea>
+        </div>
+  
+        <div class="row">
+            <input type="file" (change)="onFileSelected($event)" name="image" accept="image/*">
+        </div>
+  
+  
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Add Post</button>
             </div>
-
-            <div class="row">
-                <div class="col-md-2">Photo:</div>
-                <div class="col-md-10">
-                    <input id="image" type="file" class="form-control" (change)="onFileSelected($event)" name="image" accept="/image">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <input type="submit" class="form-control btn btn-primary" name="submit">
-                </div>
-                <div class="col-md-6">
-                    <input type="button" class="form-control btn btn-danger" name="reset" value="Cancel">
-                </div>
-            </div>
-        </form>
+        </div>
+  
+      </form>
     </div>
+  
 </section>

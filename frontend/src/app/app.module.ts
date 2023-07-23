@@ -20,6 +20,7 @@ import { AboutComponent } from './components/about/about.component';
 import { UserNavbarComponent } from './user/user-navbar/user-navbar.component';
 import { PostingComponent } from './components/posting/posting.component';
 
+
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   text: 'Loading...',
   textColor: '#FFFFFF',
