@@ -27,14 +27,19 @@ export class PostingComponent {
   }
 
   onFileSelected(event:any) {
-
+    console.log(event.target.files);
     this.file = event.target.files[0]
   }  
   addPost(event:any){
+    const texts=this.post.value;
+    const username=localStorage.getItem('username');
+    if(!this.file && !texts.texts){
+      return;
+    }
     if (this.file) {
+      console.log("pic uploading");
       const formData = new FormData();
-      const username=localStorage.getItem('username');
-      console.log(username);
+
       if(username){
         formData.append("username",username);
       }
@@ -45,14 +50,22 @@ export class PostingComponent {
         const image_name=JSON.parse(JSON.stringify(response));
         this.data={
           username:username,
-          image_name:image_name,
-          texts:this.post.texts
+          image_name:image_name["token"],
+          texts:texts.texts?texts.texts:null
         }
+        console.log(this.data);
       });
 
     }
+    else{
+      this.data={
+        username:username,
+        image_name:null,
+        texts:texts.texts
+      }
+    }
     this.apiService.addPost(this.data).subscribe((response)=>{
-      
+      console.log(response);
     });
   }
 }

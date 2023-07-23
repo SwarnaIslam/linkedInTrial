@@ -16,6 +16,6 @@ class User(BaseModel):
 
 
 class POSTS(BaseModel):
-    image_name:str=""
+    image_name:Optional[str]=None
     username:str=""
-    text:str=""
+    texts:Optional[str]=None

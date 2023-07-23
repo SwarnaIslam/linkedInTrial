@@ -108,7 +108,22 @@ async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None
 
     return {"token": unique_filename}
 
-
+@app.post("/add-post")
+async def add_post(post:POSTS):
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        sql = "INSERT INTO posts (image_name, username, texts) VALUES (%s, %s, %s)"
+        values = (post.image_name, post.username, post.texts)
+        cursor.execute(sql, values)
+        db.commit()
+    # except mysql.connector.Error as error:
+    #     print("Error connecting to database: ", error)
+    #     raise HTTPException(status_code=500, detail="Internal server error")
+    finally:
+        cursor.close()
+        db.close()
+    return {"message": "Post added successfully"}
 
 @app.get("/posts", response_model=list[POSTS])
 async def get_posts():
