@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { response } from 'express';
 import { ApiService } from 'src/app/services/api.service';
 @Component({
   selector: 'app-posting',
@@ -10,7 +11,7 @@ import { ApiService } from 'src/app/services/api.service';
 })
 export class PostingComponent {
   data:any;
-  fileToUpload:any;
+  file:any;
   post:any=FormGroup;
   constructor(
     private router:Router,
@@ -21,24 +22,37 @@ export class PostingComponent {
 
   ngOnInit(){
     this.post = this.formBuilder.group({
-      image_name:[''],
-      username:[''],
       texts:['']
     });
   }
 
   onFileSelected(event:any) {
 
-    const file: File = event.target.files[0]
-    console.log(`onFileSelected(${file.name})`)
-
-    if (file) {
-      const formData = new FormData();
-      formData.append("thumbnail", file);
-      const upload$ = this.http.post("http://localhost:8000/thumbnail-upload", formData);
-      upload$.subscribe();
-      console.log("upload done?")
-    }
-
+    this.file = event.target.files[0]
   }  
+  addPost(event:any){
+    if (this.file) {
+      const formData = new FormData();
+      const username=localStorage.getItem('username');
+      console.log(username);
+      if(username){
+        formData.append("username",username);
+      }
+      formData.append("thumbnail", this.file);
+
+      const upload$ = this.apiService.addImage(formData);
+      upload$.subscribe((response)=>{
+        const image_name=JSON.parse(JSON.stringify(response));
+        this.data={
+          username:username,
+          image_name:image_name,
+          texts:this.post.texts
+        }
+      });
+
+    }
+    this.apiService.addPost(this.data).subscribe((response)=>{
+      
+    });
+  }
 }

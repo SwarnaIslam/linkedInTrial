@@ -39,6 +39,7 @@ export class LoginComponent {
 
         this.snackBarService.openSnackBar('Welcome ' + response.name, '');
         localStorage.setItem('token', "user");
+        localStorage.setItem('username',this.email)
         this.router.navigate(['/home']).then(() => { window.location.reload(); });
         
 

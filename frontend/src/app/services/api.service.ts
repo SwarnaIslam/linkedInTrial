@@ -44,7 +44,7 @@ export class ApiService {
 
 
   addImage(formData: any) {
-    return this.http.post(this.url + '/upload-image',formData);
+    return this.http.post(this.url + '/thumbnail-upload',formData);
   }
   
 

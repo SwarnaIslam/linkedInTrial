@@ -1,7 +1,7 @@
 from model import User,POSTS
 import os
 import io
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException,Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
 from pydantic import BaseModel
@@ -90,31 +90,25 @@ minio_client = Minio(
     secure=False,  # Set to True if using HTTPS
 )
 
-# @app.post("/upload-image")
-# async def uploadImage(file: UploadFile = File(...)):
-#     print(file)
-#     # Read the file contents into bytes using read()
-#     file_bytes = await file.read()
-
-#     unique_filename = str(uuid.uuid4()) + "_" + file.filename
-#     # Convert bytes to an io.BytesIO object
-#     file_stream = io.BytesIO(file_bytes)
-
-#     # Use the io.BytesIO object to upload the file to MinIO
-#     minio_client.put_object(
-#         "linkedin",
-#         unique_filename,
-#         file_stream,
-#         length=len(file_bytes),
-#         content_type=file.content_type,
-#     )
-
-#     return {"message": "Image uploaded successfully"}
-
 @app.post("/thumbnail-upload")
-def create_file(thumbnail: UploadFile = File(...)):
-    print(thumbnail)
-    return {"file_size": len(thumbnail.file.read())}
+async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None)):
+    print(username)
+    file_bytes = await thumbnail.read()
+    unique_filename = username+"_"+str(uuid.uuid4()) + "_" + thumbnail.filename
+
+    file_stream = io.BytesIO(file_bytes)
+
+    minio_client.put_object(
+        "linkedin",
+        unique_filename,
+        file_stream,
+        length=len(file_bytes),
+        content_type=thumbnail.content_type,
+    )
+
+    return {"token": unique_filename}
+
+
 
 @app.get("/posts", response_model=list[POSTS])
 async def get_posts():
