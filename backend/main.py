@@ -126,9 +126,10 @@ async def add_post(post:POSTS):
     return {"message": "Post added successfully"}
 
 # Get all unapproved users [DONE]
-@app.get("/all-posts", response_model=list[User])
+@app.get("/posts/all-posts", response_model=list[POSTS])
 def get_posts():
     # MySQL Connection
+    print("getting users")
     db = get_db()
     cursor = db.cursor()
 
@@ -149,9 +150,9 @@ def get_posts():
         post_list = []
         for post in posts:
             post_list.append({
-                "image_name": post[0],
-                "username": post[1],
-                "texts": post[2]
+                "image_name": post[1],
+                "username": post[2],
+                "texts": post[3]
             })
 
         # Close the database connection
@@ -159,4 +160,5 @@ def get_posts():
         db.close()
 
         # Return the list of unapproved users as a JSON response
+        print(post_list)
         return post_list

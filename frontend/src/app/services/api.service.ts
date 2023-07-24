@@ -30,9 +30,11 @@ export class ApiService {
 
 
   allPosts() {
-    return this.http.get(this.url + '/all-posts', {
+    const posts=this.http.get(this.url + '/posts/all-posts', {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
+    console.log(this.url + '/posts/all-posts');
+    return posts;
   }
 
 
