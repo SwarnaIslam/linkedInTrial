@@ -3,14 +3,15 @@
 
     <!-- ======= Services Section ======= -->
     <section class="services">
-      <div class="container justify-cntent-center align-content-center" *ngFor="let post of posts">
+      <div class="container justify-content-center " *ngFor="let post of posts">
         <div class="section-title">
         </div>
         <div class="row">
           <div class="col" data-aos="fade-up">
             <div class="icon-box">
-              <img src="../../assets/img/book_cover/discrete_kenneth.png" alt="discrete_kenneth" width="90%" height="70%">
-              <p></p>
+              <h2 text-start>{{post.username}}</h2>
+              <img [src]="post.image_name" alt="discrete_kenneth" width="90%" height="70%">
+              <p text-start>{{post.texts}}</p>
               <h6> </h6>
             </div>
           </div>

@@ -94,7 +94,7 @@ minio_client = Minio(
 async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None)):
     print(username)
     file_bytes = await thumbnail.read()
-    unique_filename = username+"_"+str(uuid.uuid4()) + "_" + thumbnail.filename
+    unique_filename = username+str(uuid.uuid4()) + "_" + thumbnail.filename
 
     file_stream = io.BytesIO(file_bytes)
 
@@ -106,7 +106,9 @@ async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None
         content_type=thumbnail.content_type,
     )
 
-    return {"token": unique_filename}
+    presigned_url = minio_client.presigned_get_object('linkedin', unique_filename)
+    print(presigned_url)
+    return {"token": presigned_url}
 
 @app.post("/add-post")
 async def add_post(post:POSTS):
