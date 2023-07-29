@@ -1,0 +1,26 @@
+
+<main id="main">
+
+  <!-- ======= Services Section ======= -->
+  <section class="services">
+    <div class="container justify-content-center " *ngFor="let notification of notifications">
+      <div class="section-title">
+      </div>
+      <div class="row">
+        <div class="col" data-aos="fade-up">
+          <a routerLink="/singlePost" routerLinkActive="active" [queryParams]="{postId:notification.postId}" style="cursor: pointer; ">
+            <div class="icon-box">
+              <h2 text-start style="display: inline;">{{notification.username}}</h2>
+              <p text-start style="display: inline; margin-left: 10px;">{{notification.message}}</p>
+              <h3 text-center>{{notification.timestamp}}</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+
+</main>

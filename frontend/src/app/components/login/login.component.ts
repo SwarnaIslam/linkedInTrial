@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  email: string = '';
+  username: string = '';
   password: string = '';
   responseMsg: any;
 
@@ -27,25 +27,21 @@ export class LoginComponent {
   onSubmit() {
     this.ngxService.start();
 
-    const data = { email: this.email, password: this.password };
-    console.log(data);
+    const data = { username: this.username, password: this.password };
 
     this.apiService.login(data).subscribe(
       (response: any) => {
-        console.log("RES: ", response);
         this.ngxService.stop();
         this.responseMsg = response?.message;
-        console.log(response.name);
 
         this.snackBarService.openSnackBar('Welcome ' + response.name, '');
         localStorage.setItem('token', "user");
-        localStorage.setItem('username',this.email)
+        localStorage.setItem('username',this.username)
         this.router.navigate(['/home']).then(() => { window.location.reload(); });
         
 
       },
       (error) => {
-        console.log("Error: ", error.error.detail)
         this.ngxService.stop();
         if (error.error?.detail) {
           this.responseMsg = error.error?.detail;

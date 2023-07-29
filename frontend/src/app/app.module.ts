@@ -16,9 +16,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { AboutComponent } from './components/about/about.component';
-import { UserNavbarComponent } from './user/user-navbar/user-navbar.component';
+import { UserNavbarComponent } from './components/user-navbar/user-navbar.component';
 import { PostingComponent } from './components/posting/posting.component';
+import { NotificationComponent } from './components/notification/notification.component';
+import { SinglePostComponent } from './components/single-post/single-post.component';
 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -42,9 +43,10 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
         FooterComponent,
         SignupComponent,
         LoginComponent,
-        AboutComponent,
         UserNavbarComponent,
-        PostingComponent
+        PostingComponent,
+        NotificationComponent,
+        SinglePostComponent
     ],
     providers: [],
     bootstrap: [AppComponent],

@@ -13,7 +13,8 @@ from fastapi.responses import JSONResponse
 from fastapi import FastAPI, File, UploadFile
 from minio import Minio
 import uuid
-
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -45,12 +46,11 @@ def get_db():
 
 # define a login endpoint [DONE]
 @app.post("/login")
-async def login(email: str = Body(), password: str = Body()):
+async def login(username: str = Body(), password: str = Body()):
     db = get_db()
     cursor = db.cursor()
-    print("Working...")
-    query = "SELECT * FROM user WHERE email = %s AND password = %s"
-    values = (email, password)
+    query = "SELECT * FROM user WHERE username = %s AND password = %s"
+    values = (username, password)
     cursor.execute(query, values)
 
     result = cursor.fetchone()
@@ -59,16 +59,15 @@ async def login(email: str = Body(), password: str = Body()):
         raise HTTPException(
             status_code=401, detail="Invalid username or password")
     else:
-        return {'name': result[0], 'role': result[10]}
+        return {'name': result[0]}
 
 
 # Route to create a new user [DONE]
 @app.post("/signup")
 async def signup(user: User, db: mysql.connector.connection.MySQLConnection = Depends(get_db)):
     # Check if the username or email is already in use
-    print("RESULT: ", user)
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM user WHERE name = %s OR email = %s", (user.name, user.email))
+    cursor.execute("SELECT * FROM user WHERE username = %s OR email = %s", (user.username, user.email))
     result = cursor.fetchone()
 
     if result:
@@ -76,8 +75,8 @@ async def signup(user: User, db: mysql.connector.connection.MySQLConnection = De
 
     else:
         # Insert the new user into the database
-        cursor.execute("INSERT INTO user (name, roll, batch, session, program_level, mobile_number, address, email, password, status, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                       (user.name, user.roll, user.batch, user.session, user.program_level, user.mobile_number, user.address, user.email, user.password, user.status, user.role))
+        cursor.execute("INSERT INTO user (username, email, password) VALUES (%s, %s, %s)",
+                       (user.username, user.email, user.password))
         db.commit()
 
         return {"User created successfully"}
@@ -91,8 +90,7 @@ minio_client = Minio(
 )
 
 @app.post("/thumbnail-upload")
-async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None)):
-    print(username)
+async def upload_image(username:str=Form(None), thumbnail: UploadFile = File(None)):
     file_bytes = await thumbnail.read()
     unique_filename = username+str(uuid.uuid4()) + "_" + thumbnail.filename
 
@@ -107,7 +105,6 @@ async def create_file(username:str=Form(None), thumbnail: UploadFile = File(None
     )
 
     presigned_url = minio_client.presigned_get_object('linkedin', unique_filename)
-    print(presigned_url)
     return {"token": presigned_url}
 
 @app.post("/add-post")
@@ -115,23 +112,30 @@ async def add_post(post:POSTS):
     try:
         db = get_db()
         cursor = db.cursor()
-        sql = "INSERT INTO posts (image_name, username, texts) VALUES (%s, %s, %s)"
+        postSql = "INSERT INTO posts (image_name, username, texts) VALUES (%s, %s, %s)"
         values = (post.image_name, post.username, post.texts)
-        cursor.execute(sql, values)
+        cursor.execute(postSql, values)
+        postId=cursor.lastrowid
+        message="Added an image!"
+        if post.texts:
+            message=post.texts[:70]
+
+        currentTime=datetime.now()
+        notifySql="INSERT INTO notifications (username, postId, timestamp, message) VALUES(%s,%s,%s,%s)"
+        values=(post.username, postId, currentTime, message)
+
+        cursor.execute(notifySql, values)
         db.commit()
-    # except mysql.connector.Error as error:
-    #     print("Error connecting to database: ", error)
-    #     raise HTTPException(status_code=500, detail="Internal server error")
+    except mysql.connector.Error as error:
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         cursor.close()
         db.close()
     return {"message": "Post added successfully"}
 
-# Get all unapproved users [DONE]
-@app.get("/posts/all-posts", response_model=list[POSTS])
+@app.get("/all-posts", response_model=list[POSTS])
 def get_posts():
     # MySQL Connection
-    print("getting users")
     db = get_db()
     cursor = db.cursor()
 
@@ -143,24 +147,83 @@ def get_posts():
 
     # Get all rows that match the search criteria
     posts = cursor.fetchall()
+    post_list = []
+    for post in posts:
+        post_list.append({
+            "image_name": post[1],
+            "username": post[2],
+            "texts": post[3]
+        })
 
-    # Check if any users were found
-    if len(posts) == 0:
-        return JSONResponse(content={"message": "No unapproved users found"})
-    else:
-        # Convert the result to a list of User objects
-        post_list = []
-        for post in posts:
-            post_list.append({
-                "image_name": post[1],
-                "username": post[2],
-                "texts": post[3]
-            })
+    # Close the database connection
+    cursor.close()
+    db.close()
+    return post_list
 
-        # Close the database connection
-        cursor.close()
-        db.close()
+@app.get('/get-post/{postId}', response_model=POSTS)
+async def get_post(postId:int):
+    # MySQL Connection
+    db = get_db()
+    cursor = db.cursor()
 
+    # Query
+    query = "SELECT * FROM posts WHERE postId=%s"
+    # Execute Query
+    cursor.execute(query,(postId,))
+
+    # Get all rows that match the search criteria
+    post = cursor.fetchone()
+    return {
+            "image_name": post[1],
+            "username": post[2],
+            "texts": post[3]
+        }
+
+
+@app.get('/notification/{username}')
+async def get_notifications(username:str):
+    # MySQL Connection
+    db = get_db()
+    cursor = db.cursor()
+    one_hour_ago=datetime.now()-timedelta(hours=1)
+
+    # Query
+    query = "SELECT * FROM notifications WHERE username != %s AND timestamp>=%s"
+
+    # Execute Query
+    cursor.execute(query,(username,one_hour_ago))
+
+    # Get all rows that match the search criteria
+    notifications = cursor.fetchall()
+    notification_list = []
+    for notification in notifications:
+        # Define the format of the input datetime string
+        input_format = "%Y-%m-%d %H:%M:%S"
+        notification_list.append({
+            "username": notification[1],
+            "postId":notification[2],
+            "timestamp": notification[3].strftime(input_format),
+            "message": notification[4]
+        })
+
+    # Close the database connection
+    cursor.close()
+    db.close()
+    print(datetime.now())
         # Return the list of unapproved users as a JSON response
-        print(post_list)
-        return post_list
+    return notification_list
+
+# Add the notification cleaner job
+def clean_notifications():
+    one_hour_ago = datetime.now() - timedelta(hours=1)
+    delete_query = "DELETE FROM notifications WHERE timestamp <= %s"
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(delete_query, (one_hour_ago,))
+    db.commit()
+    cursor.close()
+
+# Schedule the notification cleaner job to run every hour (you can adjust the interval as needed)
+scheduler = BackgroundScheduler()
+scheduler.add_job(clean_notifications, 'interval', minutes=1)
+scheduler.start()

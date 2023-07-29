@@ -30,14 +30,18 @@ export class ApiService {
 
 
   allPosts() {
-    const posts=this.http.get(this.url + '/posts/all-posts', {
+    const posts=this.http.get(this.url + '/all-posts', {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
-    console.log(this.url + '/posts/all-posts');
     return posts;
   }
 
-
+  getPost(postId:number){
+    const post = this.http.get(this.url+'/get-post/'+postId,{
+      headers: new HttpHeaders().set('Content-Type','application/json')
+    });
+    return post;
+  }
   addPost(data: any) {
     return this.http.post(this.url + '/add-post', JSON.stringify(data), {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
@@ -49,5 +53,12 @@ export class ApiService {
     return this.http.post(this.url + '/thumbnail-upload',formData);
   }
   
+  allNotifications(username:any){
+    const notifications=this.http.get(this.url + '/notification/'+username, {
+      headers: new HttpHeaders().set('Content-Type', 'application/json')
+    });
+    console.log(notifications);
+    return notifications;
+  }
 
 }

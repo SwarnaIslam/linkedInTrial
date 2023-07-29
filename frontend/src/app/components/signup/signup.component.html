@@ -5,37 +5,8 @@
       <div class="user-details">
 
         <div class="input-box">
-          <span class="details">Full Name</span>
-          <input type="text" placeholder="Jhon Doe" formControlName="fullName" required pattern="^[a-zA-Z ]*$">
-        </div>
-
-        <div class="input-box">
-          <span class="details">Roll</span>
-          <input type="number" placeholder="1204" formControlName="roll" required pattern="^\d{4}$">
-        </div>
-        <div class="input-box">
-          <span class="details">Batch</span>
-          <input type="number" placeholder="09" formControlName="batch" required
-            [class.invalid]="registrationForm.get('batch').invalid && registrationForm.get('batch').dirty">
-          <div *ngIf="registrationForm.get('batch').invalid && registrationForm.get('batch').dirty" style="color: red">
-            Please enter number only (eg. 10, 12)
-          </div>
-        </div>
-        <div class="input-box">
-          <span class="details">Session</span>
-          <input type="text" placeholder="09-10" formControlName="session" required pattern="^\d{2}-\d{2}$">
-        </div>
-        <div class="input-box">
-          <span class="details">Program Level</span>
-          <input type="text" placeholder="BSSE/MSSE/MIT/PGDIT" formControlName="programLevel" required pattern="^[a-zA-Z]+$"
-          [class.invalid]="registrationForm.get('programLevel').invalid && registrationForm.get('programLevel').dirty">
-          <div *ngIf="registrationForm.get('programLevel').invalid && registrationForm.get('programLevel').dirty" style="color: red">
-            Only BSSE, MSSE, MIT, PGDIT are allowed
-          </div>
-        </div>
-        <div class="input-box">
-          <span class="details">Phone Number</span>
-          <input type="text" placeholder="01924088515" formControlName="phoneNumber" required pattern="^\d{11}$">
+          <span class="details">Username</span>
+          <input type="text" placeholder="Jhon Doe" formControlName="username" required pattern="^[a-zA-Z ]*$">
         </div>
         <div class="input-box">
           <span class="details">Email</span>
@@ -48,10 +19,6 @@
         <div class="input-box">
           <span class="details">Password</span>
           <input type="password" placeholder="Enter your password" formControlName="password" required>
-        </div>
-        <div class="input-box">
-          <span class="details">Address</span>
-          <textarea id="address" name="address" rows="10" cols="56" formControlName="address" required></textarea>
         </div>
       </div>
 

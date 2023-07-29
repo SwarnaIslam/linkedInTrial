@@ -10,19 +10,14 @@ import { CommonModule } from '@angular/common';
 export class HomepageComponent {
 
   posts:any=[];
-  postObj:any=[];
   constructor(private router:Router,private apiService:ApiService){
   }
   
   ngOnInit(){
     this.apiService.allPosts().subscribe((data:any)=>{
       this.posts=data;
-      // for(var i=0;i<this.posts.length;i++){
-      //   this.imageObj.push(this.getMinIOImage(this.posts[i].image_name));
-      // }
-      this.postObj=JSON.stringify(this.posts);
+      // console.log(JSON.stringify(this.posts));
     });
-
   }
   
 }

@@ -27,7 +27,6 @@ export class PostingComponent {
   }
 
   onFileSelected(event:any) {
-    console.log(event.target.files);
     this.file = event.target.files[0]
   }  
   addPost(event:any){
@@ -37,7 +36,6 @@ export class PostingComponent {
       return;
     }
     if (this.file) {
-      console.log("pic uploading");
       const formData = new FormData();
 
       if(username){
@@ -53,7 +51,6 @@ export class PostingComponent {
           image_name:image_name["token"],
           texts:texts.texts?texts.texts:null
         }
-        console.log(this.data);
       });
 
     }
