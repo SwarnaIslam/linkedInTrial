@@ -1,15 +1,9 @@
 from model import User,POSTS
-import os
 import io
 from fastapi import Body, FastAPI, HTTPException,Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
-from pydantic import BaseModel
-from typing import Optional
 import mysql.connector
-import smtplib
-from email.mime.text import MIMEText
-from fastapi.responses import JSONResponse
 from fastapi import FastAPI, File, UploadFile
 from minio import Minio
 import uuid
