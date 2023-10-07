@@ -1,6 +1,6 @@
 export class Posting {
     username:string="";
-    image_name:number=0;
+    image_url:string="";
     texts:string="";
 
 }

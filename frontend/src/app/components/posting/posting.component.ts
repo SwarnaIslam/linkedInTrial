@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { response } from 'express';
 import { ApiService } from 'src/app/services/api.service';
 @Component({
   selector: 'app-posting',
@@ -22,7 +21,7 @@ export class PostingComponent {
 
   ngOnInit(){
     this.post = this.formBuilder.group({
-      texts:['']
+      texts: new FormArray([this.formBuilder.control('')])
     });
   }
 
@@ -30,37 +29,19 @@ export class PostingComponent {
     this.file = event.target.files[0]
   }  
   addPost(event:any){
-    const texts=this.post.value;
+    let texts=this.post.get('texts').value;
+    texts=texts.join('\n');
+
     const username=localStorage.getItem('username');
     if(!this.file && !texts.texts){
       return;
     }
-    if (this.file) {
-      const formData = new FormData();
-
-      if(username){
-        formData.append("username",username);
-      }
-      formData.append("thumbnail", this.file);
-
-      const upload$ = this.apiService.addImage(formData);
-      upload$.subscribe((response)=>{
-        const image_name=JSON.parse(JSON.stringify(response));
-        this.data={
-          username:username,
-          image_name:image_name["token"],
-          texts:texts.texts?texts.texts:null
-        }
-      });
-
-    }
-    else{
-      this.data={
-        username:username,
-        image_name:null,
-        texts:texts.texts
-      }
-    }
+    this.data={
+      username,
+      texts,
+      image_file:this.file
+    };
+    
     this.apiService.addPost(this.data).subscribe((response)=>{
       console.log(response);
     });

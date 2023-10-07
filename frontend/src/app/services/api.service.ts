@@ -7,7 +7,7 @@ import { SnackBarService } from './snack-bar.service';
 })
 export class ApiService {
 
-  url = 'http://127.0.0.1:8000';
+  url = 'http://localhost:8080';
   boundary: any = Math.random().toString().substr(2);
 
   constructor(private http: HttpClient, private snackBarService: SnackBarService) { }
@@ -17,40 +17,35 @@ export class ApiService {
   }
 
   login(data: any) {
-    return this.http.post(this.url + '/login', JSON.stringify(data), {
+    return this.http.post(this.url + '/auth/login', JSON.stringify(data), {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
   }
 
   signup(data: any) {
-    return this.http.post(this.url + '/signup', JSON.stringify(data), {
+    return this.http.post(this.url + '/auth/signup', JSON.stringify(data), {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
   }
 
 
   allPosts() {
-    const posts=this.http.get(this.url + '/all-posts', {
+    const posts=this.http.get(this.url + '/posts', {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
     return posts;
   }
 
   getPost(postId:number){
-    const post = this.http.get(this.url+'/get-post/'+postId,{
+    const post = this.http.get(this.url+'/post/'+postId,{
       headers: new HttpHeaders().set('Content-Type','application/json')
     });
     return post;
   }
   addPost(data: any) {
-    return this.http.post(this.url + '/add-post', JSON.stringify(data), {
+    return this.http.post(this.url + '/post', JSON.stringify(data), {
       headers: new HttpHeaders().set('Content-Type', 'application/json')
     });
-  }
-
-
-  addImage(formData: any) {
-    return this.http.post(this.url + '/thumbnail-upload',formData);
   }
   
   allNotifications(username:any){

@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-mysql-connector-python
-minio
-pydantic
