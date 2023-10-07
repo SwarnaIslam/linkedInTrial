@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile
 from datetime import datetime, timezone
 from minio import Minio
 import io
@@ -67,13 +67,20 @@ async def get_post(postId: str):
         print(error)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    
+def convert_dict_to_upload_file(dict_object: dict) -> UploadFile:
+    return UploadFile(
+        filename=dict_object["name"],
+        content_type=dict_object["type"],
+        file=dict_object["file"]
+    ) 
 @posting.post("/post")
 async def add_post(post:NewPost):
+    print(post)
     try:
         image_url=""
         if post.image_file:
-            image_url = await upload_image(post.image_file, post.username)
+            image_file = convert_dict_to_upload_file(post.image_file)
+            image_url = await upload_image(image_file, post.username)
         result = post_db['post'].insert_one({
             "username": post.username,
             "texts": post.texts,

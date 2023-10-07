@@ -1,7 +1,7 @@
 from model import User,POSTS
 import io
 from fastapi import Body, FastAPI, HTTPException,Form
-from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi.params import Depends
 import mysql.connector
 from fastapi import FastAPI, File, UploadFile
@@ -11,7 +11,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 
 app = FastAPI()
-
+from fastapi.middleware.cors import CORSMiddleware
 origins = [
     "http://localhost",
     "https://localhost",

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi import UploadFile
-from typing import Optional
+from typing import Optional, List
 class POSTS(BaseModel):
     id: str
     username: str
@@ -10,4 +10,4 @@ class POSTS(BaseModel):
 class NewPost(BaseModel):
     username:str
     image_file:Optional[UploadFile]=None
-    texts:Optional[str]
+    texts: Optional[List[str]] = []

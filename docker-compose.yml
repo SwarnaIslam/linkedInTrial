@@ -87,13 +87,13 @@ services:
       context: ./frontend  # Adjust the context path to your Angular app
     ports:
       - "4200:4200"  # Expose the Angular app's port
+    command: ng serve --host 0.0.0.0
     networks:
       - mynetwork
     depends_on:
       - auth-service  
       - post-service
       - notification-service
-    command: ["npm", "start"]
 volumes:
   minio_data:
 networks:
