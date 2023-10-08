@@ -50,7 +50,6 @@ export class PostingComponent implements OnInit {
       formData.append('image_file', this.file);
     }
     console.log(formData)
-    console.log(JSON.stringify(formData))
     this.apiService.addPost(formData).subscribe((response) => {
       console.log(response);
     });

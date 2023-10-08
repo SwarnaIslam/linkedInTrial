@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, UploadFile, Form, File
 from datetime import datetime, timezone
 from minio import Minio
 import io
 import uuid
 from config import post_db
-from model import POSTS, NewPost
+from model import POSTS
 from schemas import postEntity, postsEntity
 from bson import ObjectId
 import pika
@@ -67,34 +67,29 @@ async def get_post(postId: str):
         print(error)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-def convert_dict_to_upload_file(dict_object: dict) -> UploadFile:
-    return UploadFile(
-        filename=dict_object["name"],
-        content_type=dict_object["type"],
-        file=dict_object["file"]
-    ) 
+
 @posting.post("/post")
-async def add_post(post:NewPost):
-    print(post)
+async def add_post(username: str = Form(None),
+    texts: str = Form(None),
+    image_file: UploadFile = File(None)):
     try:
         image_url=""
-        if post.image_file:
-            image_file = convert_dict_to_upload_file(post.image_file)
-            image_url = await upload_image(image_file, post.username)
+        if image_file:
+            image_url = await upload_image(image_file, username)
         result = post_db['post'].insert_one({
-            "username": post.username,
-            "texts": post.texts,
+            "username": username,
+            "texts": texts,
             "image_url": image_url
         })
         post_id = result.inserted_id
 
         # Create notification message
         message = "Added an image!"
-        if post.texts:
-            message = post.texts[:70]
+        if texts:
+            message = texts[:70]
 
         notification_data = {
-            "username": post.username,
+            "username": username,
             "postId": str(post_id),
             "timestamp": datetime.now().astimezone(timezone.utc).isoformat(),
             "message": message
@@ -114,12 +109,15 @@ async def add_post(post:NewPost):
 
 minio_client = Minio(
     "minio:9000",  
-    access_key="EsCAeDi5YXtJoaoXoOSI",
-    secret_key="4yRy6oiALNkaeVQX5kTobyxAgld28eRDhOzhW8cP",
+    access_key="lala",
+    secret_key="lala1212",
     secure=False, 
 )
 
 async def upload_image(imgFile,username:str):
+    bucket_name = "linkedin"
+    if not minio_client.bucket_exists(bucket_name):
+        minio_client.make_bucket(bucket_name)
     file_bytes = await imgFile.read()
     unique_filename = username+str(uuid.uuid4()) + "_" + imgFile.filename
 

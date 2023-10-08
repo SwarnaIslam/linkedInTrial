@@ -50,14 +50,15 @@ services:
 
   minio:
     image: minio/minio
-    networks:
-      - mynetwork
     ports:
       - "9000:9000"
+    networks:
+      - mynetwork
     env_file:
       - minio.env
     volumes:
       - minio_data:/data
+    command: minio server /data
 
 
 

@@ -42,17 +42,8 @@ export class ApiService {
     });
     return post;
   }
-  addPost(data: FormData) {
-    const formDataObject:{[key: string]: any} = {};
-
-    // Iterate through the formData entries and populate the object
-    data.forEach((value, key) => {
-      formDataObject[key] = value;
-    });
-    console.log(formDataObject)
-    return this.http.post(this.url + '/post', JSON.stringify(formDataObject), {
-      headers: new HttpHeaders().set('Content-Type', 'application/json')
-    });
+  addPost(data: any) {
+    return this.http.post(this.url + '/post',data);
   }
   
   allNotifications(username:any){
