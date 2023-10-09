@@ -9,7 +9,7 @@ from schemas import postEntity, postsEntity
 from bson import ObjectId
 import pika
 import json
-from typing import Any, Dict
+
 import asyncio
 posting=APIRouter()
 
@@ -107,11 +107,27 @@ async def add_post(username: str = Form(None),
         print(error)
         raise HTTPException(status_code=500, detail="Internal server error")
 
+# Define your proxy configuration
+proxy_host = 'minio'
+proxy_port = 9000
+
+# Create an HTTP client session with proxy settings
+from urllib3 import make_headers
+from urllib3 import ProxyManager
+
+proxy_headers = make_headers(proxy_basic_auth='username:password')  # If your proxy requires authentication
+http_client = ProxyManager(
+    proxy_url=f"http://{proxy_host}:{proxy_port}",
+    proxy_headers=proxy_headers
+)
+
+# Create a Minio client with the configured HTTP client
 minio_client = Minio(
-    "minio:9000",  
+    "localhost:9000",
     access_key="lala",
     secret_key="lala1212",
-    secure=False, 
+    http_client=http_client,  # Set the custom HTTP client with proxy settings
+    secure=False,
 )
 
 async def upload_image(imgFile,username:str):
@@ -132,4 +148,5 @@ async def upload_image(imgFile,username:str):
     )
 
     presigned_url = minio_client.presigned_get_object('linkedin', unique_filename)
+    print(presigned_url)
     return presigned_url
