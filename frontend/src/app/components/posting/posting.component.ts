@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
+import { SnackBarService } from 'src/app/services/snack-bar.service';
 
 @Component({
   selector: 'app-posting',
@@ -18,12 +19,12 @@ export class PostingComponent implements OnInit {
     private router: Router,
     private apiService: ApiService,
     private formBuilder: FormBuilder,
-    private http: HttpClient
+    private snackBarService:SnackBarService
   ) {}
 
   ngOnInit() {
     this.post = this.formBuilder.group({
-      texts: new FormArray([]) // Initialize as an empty FormArray
+      texts:['']
     });
   }
 
@@ -32,7 +33,7 @@ export class PostingComponent implements OnInit {
   }
 
   addPost(event: any) {
-    const texts = this.post.get('texts')?.value;
+    const texts=this.post.get('texts').value;
     const username = localStorage.getItem('username');
 
     if (!this.file && texts.length === 0) {
@@ -44,14 +45,20 @@ export class PostingComponent implements OnInit {
       formData.append('username', username);
 
     // Join texts with '\n' separator
-    formData.append('texts', texts.join('\n'));
+    formData.append('texts', texts);
 
     if (this.file) {
       formData.append('image_file', this.file);
     }
-    console.log(formData)
+    
     this.apiService.addPost(formData).subscribe((response) => {
-      console.log(response);
+      this.snackBarService.openSnackBar('Post Created!','');
+      this.router.navigate(['/home']);
+
+    },
+    (error)=>{
+      this.snackBarService.openSnackBar(error,'');
+      this.router.navigate(['/home']);
     });
   }
 }
