@@ -1,24 +1,23 @@
+<main id="main">
 
-  <main id="main">
+  <!-- ======= Services Section ======= -->
+  <section class="services">
+    <div class="container justify-content-center" *ngFor="let post of posts; let last = last">
+      <!-- Use the 'last' variable to check if it's the last post -->
 
-    <!-- ======= Services Section ======= -->
-    <section class="services">
-      <div class="container justify-content-center " *ngFor="let post of posts">
-  
-        <div class="row">
-          <div class="col" data-aos="fade-up">
-            <div class="icon-box">
-              <h2 text-start>{{post.username}}</h2>
-              <img [src]="post.image_url" width="60%" height="50%">
-              <p text-start>{{post.texts}}</p>
-              <h6> </h6>
-            </div>
+      <div class="row">
+        <div class="col" data-aos="fade-up">
+          <div class="icon-box" [style.margin-bottom]="last ? '400px' : '15px'">
+            <!-- Apply margin-bottom style conditionally -->
+            <h2 text-start>{{post.username}}</h2>
+            <img [src]="post.image_url" width="60%" height="50%">
+            <p text-start>{{post.texts}}</p>
+            <h6> </h6>
           </div>
         </div>
-
       </div>
-    </section>
 
-    
+    </div>
+  </section>
 
-  </main>
+</main>

@@ -59,9 +59,6 @@ services:
     volumes:
       - minio_data:/data
     command: minio server /data
-
-
-
   
   mongodb:
     image: mongo:4.4.24
@@ -83,18 +80,7 @@ services:
       - post-service
       - notification-service
 
-  angular-frontend:  # Create a new service for your Angular frontend
-    build:
-      context: ./frontend  # Adjust the context path to your Angular app
-    ports:
-      - "4200:4200"  # Expose the Angular app's port
-    command: ng serve --host 0.0.0.0
-    networks:
-      - mynetwork
-    depends_on:
-      - auth-service  
-      - post-service
-      - notification-service
+ 
 volumes:
   minio_data:
 networks:

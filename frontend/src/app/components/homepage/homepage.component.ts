@@ -15,7 +15,8 @@ export class HomepageComponent {
   
   ngOnInit(){
     this.apiService.allPosts().subscribe((data:any)=>{
-      this.posts=data;
+      this.posts=data.reverse();
+    
       // console.log(JSON.stringify(this.posts));
     });
   }
