@@ -1,0 +1,85 @@
+version: '3'
+services:
+
+  auth-service:
+    image: swarna1214/linkedin_demo:authentication
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    networks:
+      - mynetwork
+    ports:
+      - "8001:8000"
+    depends_on:
+      - mongodb
+
+  post-service:
+    image: swarna1214/linkedin_demo:post
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    networks:
+      - mynetwork
+    ports:
+      - "8002:8000"
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - minio
+    
+  notification-service:
+    image: swarna1214/linkedin_demo:notification
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    networks:
+      - mynetwork
+    ports:
+      - "8003:8000"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    
+  
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    networks:
+      - mynetwork
+    ports:
+      - "5672:5672"  
+      - "15672:15672" 
+    env_file:
+      - rabbitmq.env
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    networks:
+      - mynetwork
+    env_file:
+      - minio.env
+    volumes:
+      - minio_data:/data
+    command: minio server /data
+
+
+
+  
+  mongodb:
+    image: mongo:4.4.24
+    networks:
+      - mynetwork
+    ports:
+      - "27017:27017"
+
+  nginx:
+    image: nginx:latest
+    networks:
+      - mynetwork
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - auth-service
+      - post-service
+      - notification-service
+volumes:
+  minio_data:
+networks:
+  mynetwork:
